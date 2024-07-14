@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export enum RecordingStatus {
     RECORDING = "RECORDING",
@@ -27,26 +27,26 @@ export function useSpeechRecognition() {
         }
     }
 
-    const appendText = (new_text: string) => {
-        setText(text + new_text);
-    };
-
     useEffect(() => {
         if (window !== undefined) {
+
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (typeof SpeechRecognition !== "undefined" && recognition === null) {
                 const recognition = new SpeechRecognition();
                 recognition.onresult = (event: SpeechRecognitionEvent) => {
-                    var text = "";
+
+                    var _text = "";
                     for (const res of event.results) {
-                        text += res[0].transcript;
+                        _text += "\n" + res[0].transcript.trim();
                     }
-                    appendText(text)
+
+                    setText(_text.trim());
+
                 };
                 recognition.continuous = true;
                 recognition.interimResults = true;
-                recognition.onstart = () => setStatus(RecordingStatus.RECORDING);
-                recognition.onend = () => setStatus(RecordingStatus.STOPPED);
+                recognition.onstart = () => { setStatus(RecordingStatus.RECORDING); };
+                recognition.onend = () => { setStatus(RecordingStatus.STOPPED); };
                 setRecognition(recognition);
             }
         }
