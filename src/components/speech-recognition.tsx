@@ -28,29 +28,27 @@ export function useSpeechRecognition() {
     }
 
     useEffect(() => {
-        if (window !== undefined && recognition === null) {
+        if (window !== undefined) {
 
             const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-            if (typeof SpeechRecognition !== "undefined" && recognition === null) {
-                const recognition = new SpeechRecognition();
-                recognition.onresult = (event: any) => {
+            const recognition = new SpeechRecognition();
+            recognition.onresult = (event: any) => {
 
-                    var _text = "";
-                    for (const res of event.results) {
-                        _text += "\n" + res[0].transcript.trim();
-                    }
+                var _text = "";
+                for (const res of event.results) {
+                    _text += "\n" + res[0].transcript.trim();
+                }
 
-                    setText(_text.trim());
+                setText(_text.trim());
 
-                };
-                recognition.continuous = true;
-                recognition.interimResults = true;
-                recognition.onstart = () => { setStatus(RecordingStatus.RECORDING); };
-                recognition.onend = () => { setStatus(RecordingStatus.STOPPED); };
-                setRecognition(recognition);
-            }
+            };
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.onstart = () => { setStatus(RecordingStatus.RECORDING); };
+            recognition.onend = () => { setStatus(RecordingStatus.STOPPED); };
+            setRecognition(recognition);
         }
-    }, [recognition]);
+    }, []);
 
 
 
