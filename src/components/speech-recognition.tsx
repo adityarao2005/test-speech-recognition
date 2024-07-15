@@ -9,7 +9,7 @@ export enum RecordingStatus {
 export function useSpeechRecognition() {
     const [text, setText] = useState("");
     const [status, setStatus] = useState(RecordingStatus.STOPPED);
-    const [recognition, setRecognition] = useState<SpeechRecognition | null>(null);
+    const [recognition, setRecognition] = useState<any>();
 
     const beginRecording = async () => {
         if (recognition !== null) {
@@ -28,12 +28,12 @@ export function useSpeechRecognition() {
     }
 
     useEffect(() => {
-        if (window !== undefined) {
+        if (window !== undefined && recognition === null) {
 
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
             if (typeof SpeechRecognition !== "undefined" && recognition === null) {
                 const recognition = new SpeechRecognition();
-                recognition.onresult = (event: SpeechRecognitionEvent) => {
+                recognition.onresult = (event: any) => {
 
                     var _text = "";
                     for (const res of event.results) {
@@ -50,7 +50,7 @@ export function useSpeechRecognition() {
                 setRecognition(recognition);
             }
         }
-    }, []);
+    }, [recognition]);
 
 
 
