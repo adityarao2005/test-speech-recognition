@@ -14,6 +14,7 @@ export function useSpeechRecognition() {
 
     const [chunks, setChunks] = useState<Blob[]>([]);
     const [audio, setAudio] = useState<string>();
+    const [stream, setStream] = useState<MediaStream>();
 
     const beginRecording = async () => {
         if (recognition !== null) {
@@ -32,6 +33,7 @@ export function useSpeechRecognition() {
                 console.log("Reached here");
             };
 
+            setStream(stream);
             setMediaRecorder(mediaRecorder);
 
             mediaRecorder?.start();
@@ -42,6 +44,8 @@ export function useSpeechRecognition() {
         if (recognition !== null) {
             recognition.stop();
             mediaRecorder?.stop();
+
+            stream?.getTracks().forEach(track => track.stop());
         }
     };
     const changeLanguage = async (lang: string) => {
@@ -80,5 +84,5 @@ export function useSpeechRecognition() {
 
     }, []);
 
-    return { text, status, beginRecording, stopRecording, changeLanguage, audio };
+    return { text, status, beginRecording, stopRecording, changeLanguage, audio, chunks };
 }
