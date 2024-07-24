@@ -12,7 +12,6 @@ export function useSpeechRecognition() {
     const [recognition, setRecognition] = useState<any>();
     const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder>();
 
-    const [chunks, setChunks] = useState<number>(0);
     const [audio, setAudio] = useState<string>();
     const [stream, setStream] = useState<MediaStream>();
 
@@ -20,19 +19,27 @@ export function useSpeechRecognition() {
         if (recognition !== null) {
             recognition.start();
 
-            var chunks: Blob[] = [];
-
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
             const mediaRecorder = new MediaRecorder(stream);
 
-            mediaRecorder.ondataavailable = (e) => {
-                chunks.push(e.data);
-                setChunks(chunks.length);
+            const id = await fetch("/api/start-media-session/", {
+                method: "POST"
+            }).then((response) => response.json()).then((data) => data.id);
+
+            mediaRecorder.ondataavailable = async (e) => {
+                await fetch(`/api/send-media/${id}`, {
+                    method: "POST",
+                    body: e.data,
+                })
             }
-            mediaRecorder.onstop = (e) => {
-                const blob = new Blob(chunks, { type: 'audio/ogg; codecs=opus' })
-                setChunks(chunks.length);
-                setAudio(URL.createObjectURL(blob))
+
+            mediaRecorder.onstop = async (e) => {
+                const path = await fetch(`/api/end-media-session/${id}`, {
+                    method: "POST",
+                }).then((response) => response.json()).then((data) => data.path);
+
+                console.log(path);
+                setAudio(path);
                 console.log("Reached here");
             };
 
@@ -88,5 +95,5 @@ export function useSpeechRecognition() {
 
     }, []);
 
-    return { text, status, beginRecording, stopRecording, changeLanguage, audio, chunks };
+    return { text, status, beginRecording, stopRecording, changeLanguage, audio };
 }
