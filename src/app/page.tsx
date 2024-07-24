@@ -48,7 +48,7 @@ export default function Home() {
 				<p>Status: {status.toString()}</p>
 
 				<div>
-					Chunks: {chunks.length}
+					Chunks: {chunks}
 				</div>
 
 				<div>Audio:

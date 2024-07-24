@@ -12,7 +12,7 @@ export function useSpeechRecognition() {
     const [recognition, setRecognition] = useState<any>();
     const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder>();
 
-    const [chunks, setChunks] = useState<Blob[]>([]);
+    const [chunks, setChunks] = useState<number>(0);
     const [audio, setAudio] = useState<string>();
     const [stream, setStream] = useState<MediaStream>();
 
@@ -20,16 +20,19 @@ export function useSpeechRecognition() {
         if (recognition !== null) {
             recognition.start();
 
+            var chunks: Blob[] = [];
 
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
             const mediaRecorder = new MediaRecorder(stream);
 
-            mediaRecorder.ondataavailable = (e) => setChunks([...chunks, e.data]);
+            mediaRecorder.ondataavailable = (e) => {
+                chunks.push(e.data);
+                setChunks(chunks.length);
+            }
             mediaRecorder.onstop = (e) => {
                 const blob = new Blob(chunks, { type: 'audio/ogg; codecs=opus' })
-                setChunks([])
+                setChunks(chunks.length);
                 setAudio(URL.createObjectURL(blob))
-
                 console.log("Reached here");
             };
 
@@ -55,6 +58,7 @@ export function useSpeechRecognition() {
     }
 
     useEffect(() => {
+        window.onerror = (err) => alert(err.toString());
 
         async function runner() {
             if (window !== undefined) {
