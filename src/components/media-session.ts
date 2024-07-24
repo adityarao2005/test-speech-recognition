@@ -1,6 +1,6 @@
 import { File } from "buffer";
 import crypto from "crypto";
-import fs from 'fs/promises'
+import { put } from "@vercel/blob";
 
 class MediaSessionManager {
     private sessions: Map<string, Buffer[]> = new Map();
@@ -24,11 +24,14 @@ class MediaSessionManager {
             this.sessions.delete(id);
 
             // Save blob to file in /public/audio
-            const filePath = `public/audio/${id}.ogg`;
-            await fs.writeFile(filePath, buffer);
+            const filePath = `${id}.ogg`;
+
+            const blob = await put(filePath, buffer, {
+                access: 'public'
+            });
 
             // Return file path
-            return `/audio/${id}.ogg`;
+            return blob.url;
         }
         return null;
     }
