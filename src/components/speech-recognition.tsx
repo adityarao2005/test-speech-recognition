@@ -24,7 +24,7 @@ export function useSpeechRecognition() {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
             const mediaRecorder = new MediaRecorder(stream);
 
-            mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+            mediaRecorder.ondataavailable = (e) => setChunks([...chunks, e.data]);
             mediaRecorder.onstop = (e) => {
                 const blob = new Blob(chunks, { type: 'audio/ogg; codecs=opus' })
                 setChunks([])
