@@ -15,7 +15,7 @@ function getEnumKeys<
 }
 
 export default function Home() {
-	const { text, status, beginRecording, stopRecording, changeLanguage } = useSpeechRecognition();
+	const { text, status, beginRecording, stopRecording, changeLanguage, audio } = useSpeechRecognition();
 	const [lang, setLang] = useState(Language.ENGLISH);
 
 	const onClick = async () => {
@@ -46,6 +46,11 @@ export default function Home() {
 					))}
 				</select>
 				<p>Status: {status.toString()}</p>
+
+				<div>Audio:
+					<audio controls={true} src={audio}></audio>
+				</div>
+
 				<button onClick={onClick} className="rounded border-black border-2">
 					{status == RecordingStatus.STOPPED ? "Click Me to Record" : "Click Me to Stop Recording"}
 				</button>
